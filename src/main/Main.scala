@@ -7,5 +7,5 @@ object Main extends App {
 
     val an = new LexAnalizer()
     an.initMap(Console.readLine()+".asm")
-   // an.analize()
+    //an.printLexic()
 }

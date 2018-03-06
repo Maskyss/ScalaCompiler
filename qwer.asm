@@ -1,4 +1,4 @@
-DATA SEGMENT
+77DATA SEGMENT
 	decem1 DD .028
 	decem2 DQ 0.025
 	decem4 DQ -0.025
@@ -8,8 +8,6 @@ DATA SEGMENT
 	des2 DQ 12345678
 	des3 DQ -12345678
 DATA ENDS
-
-
 CODE SEGMENT
 	finit
 	fadd dword ptr decem2[eax]
@@ -32,7 +30,5 @@ CODE SEGMENT
 	Fcom st(7)
 	Fadd dword ptr  fs:decem1[esi]
 	Faddp st(2), st(0)
-
-
 CODE ENDS
 END
