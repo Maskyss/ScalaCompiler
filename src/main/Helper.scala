@@ -50,9 +50,9 @@ object Helper {
 
   var Error = false
   var LexicalList = new ListBuffer[List[mainToken]]
-  var SyntaxList = new ListBuffer[tokenSyntax]
-  case class mainToken(row:Int, rowIndex:Int, token:String)
-  case class tokenSyntax(name:mainToken,function:String)
+  var SyntaxList = new ListBuffer[List[syntaxToken]]
+  case class mainToken(row:Int,  token:String)
+  case class syntaxToken(row:Int, token:String,typeOfLexem:String)
   trait BaseLexem
   case class baseDelim() extends BaseLexem {
      def setName():String = "Single lexem"
