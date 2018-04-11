@@ -1,16 +1,11 @@
 package main
-
-import java.io.FileNotFoundException
-
-import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 object Helper {
-
-  val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toList
-  val numbers = "1234567890".toList
-  val dividers = ";:,()[] "
-  def isAlph(ch:Char):Boolean = alphabet.contains(ch)
+  var fileName:String=""
+  val numbers = "1234567890"
+  val dividers = ":,()[] "
+  val commentar = ";"
   def isNum(ch:Char):Boolean = numbers.contains(ch)
   def isDiv(ch:Char):Boolean = dividers.contains(ch)
 
@@ -20,9 +15,9 @@ object Helper {
   val typeOfIdent = List("dword","qword")
   val ptr = "ptr"
   val st = "st"
-  val regSegment  = List("fs"," gs", "cs", "ss", "ds", "es")
+  val regSegment  = List("fs","gs", "cs", "ss", "ds", "es")
 
-  case  class ErrorT(str:String,row:Int, fl:Boolean)
+
   def checkWhat(tempTok:String):String ={
     tempTok match {
       case tempTok if dividers.contains(tempTok.toLowerCase) => baseDelim().setName()
@@ -34,55 +29,62 @@ object Helper {
       case tempTok if ptr.contains(tempTok.toLowerCase) => baseOperofDef().setName()
       case tempTok if st.contains(tempTok.toLowerCase) => baseCopReg().setName()
       case tempTok if checkInt(tempTok)=> baseDec().setName()
+      case tempTok if tempTok.contains(";") => baseComment().setName()
       case _ => baseUserId().setName()
     }
   }
-
-
   def checkInt(t:String):Boolean = t.matches(floatPat)
 
 
   //val intPat = """0|(\+|-)?[1-9][0-9]*[a-z]?"""
-  val floatPat =  """([^[a-zA-Z]]*(-)?[0-9]*[dD]?\.[0-9]*)|0|(-)?[1-9][0-9]*[dD]?"""
-  val operatorPat = """\[|]|\(|\)|\,|:|!="""
+  val floatPat =  """([^[a-zA-Z]]*(-)?[0-9]*[dD]?\.[0-9]*)|(-)?[0-9][0-9]*[dD]?"""
+  val operatorPat = """\[|]|\(|\)|\,|:|;|!="""
   val idPat = """[0-9]*?[a-zA-Z][0-9a-zA-Z]*"""
   val tokenPat = (idPat + "|"  +floatPat+ "|" + operatorPat).r
 
   var Error = false
+  var WarningError = 0
+  var ErrorList = new ListBuffer[ErrorT]
+  case  class ErrorT(row:Int, typeOfError:String)
+
   var LexicalList = new ListBuffer[List[mainToken]]
   var SyntaxList = new ListBuffer[List[syntaxToken]]
   case class mainToken(row:Int,  token:String)
   case class syntaxToken(row:Int, token:String,typeOfLexem:String)
-  trait BaseLexem
-  case class baseDelim() extends BaseLexem {
+
+trait base
+  case class baseDelim() {
      def setName():String = "Single lexem"
   }
-  case class baseRegSegment() extends BaseLexem {
+  case class baseRegSegment(){
      def setName():String = "Segment reg"
   }
-  case class baseTypeofIdent() extends BaseLexem {
+  case class baseTypeofIdent(){
     def setName():String  = "Type of ident"
   }
-  case class baseReg32() extends BaseLexem {
+  case class baseReg32() {
     def setName():String = "32b register"
   }
-  case class baseDirect() extends BaseLexem {
+  case class baseDirect(){
     def setName():String = "Directive"
   }
-  case class baseMachineCom() extends BaseLexem {
+  case class baseMachineCom(){
     def setName():String = "Machine command"
   }
-  case class baseOperofDef() extends BaseLexem {
+  case class baseOperofDef() {
     def setName():String ="Operator of type def"
   }
-  case class baseDec() extends BaseLexem {
+  case class baseDec() {
     def setName():String ="Dec constant"
   }
-  case class baseCopReg() extends BaseLexem {
+  case class baseCopReg(){
     def setName():String ="Coproces reg"
   }
-  case class baseUserId() extends BaseLexem {
+  case class baseUserId(){
     def setName():String ="User ident"
+  }
+  case class baseComment(){
+    def setName():String ="Comment"
   }
 
 }

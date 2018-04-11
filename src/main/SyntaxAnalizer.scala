@@ -1,64 +1,66 @@
 package main
 import main.Helper._
 
-class SyntaxAnalizer(lexAnalizer: LexAnalizer){
-  trait SynTable
+class SyntaxAnalizer{
+
   def printTable():Unit={
 
-    var tmp = 1
-    var count = 1
-    var buf = 1
-    var si = 0
+    var beginNumInLine = 1
+    var countLexem = 1
+    var numOperand = 1
+    var firstAppearRow = 0
     var str:String = ""
-    for(listBuf<- SyntaxList) {
-      si=0
-      for(go<-listBuf){
-        if(si==0)
-          Console.out.print(Console.BLUE +"ROW: "+ Console.RESET+go.row +" ")
 
-        if(go.typeOfLexem=="Dec constant"&&count==1) {
+    for(listBuf<- SyntaxList) {
+      firstAppearRow=0
+      for(go<-listBuf){
+        if(firstAppearRow==0)
+          Console.out.print(Console.BLUE +"ROW: "+ Console.RESET+go.row +" ")//print line number from a new line
+
+        if(go.typeOfLexem=="Dec constant"&&countLexem==1) {//separate checking for decemical numbers in data segment
+          Console.out.print(Console.BLUE +"OP#" +1+": "+ Console.RESET+str+" ")
           printf("%s ", go.token)
-          printf("(%d,%d) ", tmp, count)
-          tmp = 1
-          count = 1
+          printf("(%d,%d) ", beginNumInLine, countLexem)
+          beginNumInLine = 1
+          countLexem = 1
         }
 
         if(check(go)&&str.isEmpty){
-          if(go.typeOfLexem=="User ident"&&count==1)
+          if(go.typeOfLexem=="User ident"&&countLexem==1)//checking user ident in data segment and code segment
             Console.out.print(Console.BLUE +"LABEL: " + Console.RESET+go.token+" ")
 
-          printf("(%d,%d) ",tmp,count)
-          count=1
-          tmp+=1
+          printf("(%d,%d) ",beginNumInLine,countLexem)
+          countLexem=1
+          beginNumInLine+=countLexem
         }
         else {
               if(go.token==",") {
-                tmp+=1
-                buf+=1
+                beginNumInLine+=countLexem
+                numOperand+=1
+
               }
               else {
-
-                count+=1
+                countLexem+=1
                 str +=go.token
                 if(go.typeOfLexem=="Type of ident"||go.token.toLowerCase()=="ptr")
                   str+=" "
               }
 
               if(go.token=="]"||go.token==")"){
-                count-=1
-                Console.out.print(Console.BLUE +"OP#" +buf+": "+ Console.RESET+str+" ")
-                printf("(%d,%d) ",tmp,count)
+                  countLexem-=1
+                Console.out.print(Console.BLUE +"OP#" +numOperand+": "+ Console.RESET+str+" ")
+                printf("(%d,%d) ",beginNumInLine,countLexem)
+                beginNumInLine+=countLexem
                 str =""
-                tmp=1
-                count =1
+                countLexem =1
               }
         }
-        si+=1
+        firstAppearRow+=1
       }
       println()
-      buf=1
-      tmp=1
-      count =1
+      numOperand=1
+      beginNumInLine=1
+      countLexem =1
       str =""
     }
   }
